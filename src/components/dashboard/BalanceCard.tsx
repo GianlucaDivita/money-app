@@ -14,10 +14,11 @@ export const BalanceCard = memo(function BalanceCard({ income, expenses, balance
 
   return (
     <GlassCard className="animate-fade-in-up stagger-1 relative overflow-hidden" role="region" aria-label="Net balance summary">
-      {/* Subtle accent gradient in background */}
+      {/* Subtle accent gradient in background — uses radial-gradient instead of
+           filter:blur to avoid GPU compositing layers in Safari fullscreen */}
       <div
-        className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-[0.07] blur-2xl pointer-events-none"
-        style={{ background: isPositive ? 'var(--accent-income)' : 'var(--accent-expense)' }}
+        className="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-[0.1] pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${isPositive ? 'var(--accent-income)' : 'var(--accent-expense)'} 0%, transparent 70%)` }}
       />
 
       <div className="flex flex-col gap-5 relative">

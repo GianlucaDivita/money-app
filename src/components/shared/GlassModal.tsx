@@ -44,7 +44,7 @@ export function GlassModal({ isOpen, onClose, title, children, size = 'md' }: Gl
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/40 animate-fade-in"
         onClick={onClose}
         aria-hidden
       />

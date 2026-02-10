@@ -45,15 +45,22 @@ export default function App() {
     return () => clearTimeout(id);
   }, []);
 
-  // Remove animation properties after they play to prevent browsers from
-  // re-evaluating animation state when elements scroll offscreen and back.
-  // backdrop-filter + stale animation state causes cards to vanish on scroll.
+  // After entrance animations finish, remove the animation classes entirely
+  // so Safari has zero stale animation state to re-evaluate on scroll/tab switch.
+  // Removing classes (vs setting inline animation:none) keeps the DOM clean.
   useEffect(() => {
     function handleAnimationEnd(e: AnimationEvent) {
       const el = e.target as HTMLElement;
-      if (ANIM_CLASSES.some(cls => el.classList.contains(cls))) {
-        el.style.animation = 'none';
+      for (const cls of ANIM_CLASSES) {
+        if (el.classList.contains(cls)) {
+          el.classList.remove(cls);
+          break;
+        }
       }
+      // Remove stagger delay classes too
+      el.classList.forEach(cls => {
+        if (cls.startsWith('stagger-')) el.classList.remove(cls);
+      });
     }
     document.addEventListener('animationend', handleAnimationEnd);
     return () => document.removeEventListener('animationend', handleAnimationEnd);

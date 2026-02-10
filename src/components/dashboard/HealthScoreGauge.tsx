@@ -85,7 +85,7 @@ export const HealthScoreGauge = memo(function HealthScoreGauge({ score }: Health
                 strokeWidth={arcData.strokeWidth}
                 strokeLinecap="round"
                 className="transition-all duration-1000 ease-out"
-                style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+                style={{ opacity: 0.9 }}
               />
             )}
           </svg>

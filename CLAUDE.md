@@ -566,7 +566,7 @@ Every task from Phase 0 (Foundation) through Phase 3 (Polish & Power Features) h
 1. **Overscroll white edges** — Added `background-color: var(--bg-gradient-start)` to `html` rule so macOS elastic bounce reveals theme-matching color
 2. **useMemo date stability** — `new Date()` outside `useMemo` defeated all memoization. Fixed in 4 files by moving dates inside callbacks or serializing to stable string (`todayStr` pattern). Files: `useAnalytics.ts`, `SpendingHeatmap.tsx`, `BudgetProgressRings.tsx`, `BudgetsPage.tsx`
 3. **CSS cascade fix** — Removed unlayered `* { margin: 0; padding: 0 }` that overrode all Tailwind v4 layered utilities
-4. **Animation scroll fix** — Changed `animation-fill-mode: both` to `backwards`, then added global `animationend` listener (see Performance Pass below) to fully eliminate scroll-triggered card disappearance
+4. **Animation scroll fix** — Changed `animation-fill-mode: both` to `backwards`; `animationend` listener removes CSS classes after animation plays (see Safari GPU Fix below)
 5. **Collapsible sidebar** — SidebarContext + localStorage persistence, 280px expanded / 72px collapsed
 6. **Lazy route prefetching** — All 5 routes prefetched via `setTimeout(1s)` after mount, tab switching <90ms
 7. **Bundle optimization** — Explicit lucide icon map, manual Rollup chunks, 224KB gzipped total
@@ -588,7 +588,7 @@ Every task from Phase 0 (Foundation) through Phase 3 (Polish & Power Features) h
 **3. Financial Health Score** (`lib/healthScore.ts`, `components/dashboard/HealthScoreGauge.tsx`)
 - 5-component weighted score: Savings Rate (30%), Budget Adherence (25%), Spending Trend (20%), Goal Progress (15%), Consistency (10%)
 - SVG 270-degree arc gauge (7 o'clock to 5 o'clock) with color tiers: red <40, amber 40-70, green 70+
-- Drop-shadow glow on arc, sub-score progress bars below
+- Sub-score progress bars below
 
 **4. Split Transactions** (`components/transactions/SplitEditor.tsx`, `lib/calculations.ts:getEffectiveCategories`)
 - `TransactionSplit` type: `{ categoryId, amount, description? }` — optional `splits` array on Transaction
@@ -660,12 +660,33 @@ Investigated sluggish dashboard rendering, cards disappearing on scroll, and slo
 - Fix: replaced with `stableId(prefix)` counter that resets per call — same inputs produce same IDs
 - Also removed `uuid` import from insights.ts (small bundle savings)
 
-**5. Animation scroll disappearance fix** (`App.tsx`, `index.css`)
-- `animation-fill-mode: backwards` alone was NOT enough — `backdrop-filter: blur()` creates GPU compositing layers, and browsers re-evaluate stale animation state when elements re-enter the viewport after scrolling, causing cards to vanish
-- Fix: global `animationend` listener in App.tsx sets `el.style.animation = 'none'` after animation plays, eliminating all stale animation state
-- Added `contain: layout style paint` to `.glass` and `.glass-sm` CSS classes — limits compositing scope and reduces GPU memory pressure from `backdrop-filter`
+**5. Animation cleanup** (`App.tsx`)
+- Global `animationend` listener removes animation CSS classes (not inline `animation:none`) after they play
+- Leaves a completely clean DOM with zero stale animation state for Safari to re-evaluate
 
 **Bundle size**: ~231.5 KB gzipped (was ~232 KB) — slightly smaller due to `uuid` removal from insights
+
+### Safari Fullscreen GPU Fix (Feb 2026)
+
+Safari fullscreen + GPU filter properties (`backdrop-filter`, `filter: blur()`, `filter: drop-shadow()`) caused catastrophic compositor failure: cards vanished on scroll/page change, app slowed permanently, and the GPU state never recovered. Root cause: 13 simultaneous GPU compositing layers exhausting Safari's texture memory at retina resolution.
+
+**Zero-blur policy — removed ALL GPU filter properties from the entire app:**
+
+| Source | Before | After |
+|---|---|---|
+| `.glass`/`.glass-sm`/`.glass-heavy` | `backdrop-filter: blur(20px)` | Removed; `--glass-bg` opacity increased (light 0.82, dark 0.78) |
+| `.sidebar-glass` | `backdrop-filter: blur(24px)` | Removed; `--sidebar-bg` opacity increased (light 0.88, dark 0.92) |
+| `.topbar-glass` | `backdrop-filter: blur(16px)` | Removed; `--topbar-bg` opacity increased (light 0.85, dark 0.88) |
+| `.app-bg::before/::after` | `filter: blur(100px)` on solid circles | `radial-gradient()` with transparent edges (same visual, zero GPU cost) |
+| HealthScoreGauge SVG | `filter: drop-shadow(0 0 8px)` | `opacity: 0.9` |
+| SavingsRateSpotlight SVG | `filter: drop-shadow(0 0 6px)` | `opacity: 0.9` |
+| BudgetProgressRings SVG | `filter: drop-shadow(0 0 4px)` | `opacity: 0.9` |
+| GlassModal backdrop | `backdrop-blur-sm` | Darker `bg-black/40` overlay |
+| QuickAdd backdrop | `backdrop-blur-sm` | Darker `bg-black/30` overlay |
+| BalanceCard accent blob | Tailwind `blur-2xl` | `radial-gradient()` |
+| `animationend` handler | `el.style.animation = 'none'` (inline) | Removes CSS classes entirely (clean DOM) |
+
+**Result: 13 GPU compositing layers → 0.** Glass aesthetic preserved through semi-transparent backgrounds + borders + box-shadows. Verified with Playwright WebKit stress test (10 scroll cycles + 10 page navigations, all cards stable).
 
 ### Known Non-Issues
 - Recharts `-1 width/height` warnings are cosmetic (ResponsiveContainer initialization race)

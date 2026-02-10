@@ -122,7 +122,7 @@ export function QuickAdd() {
     <div className="fixed inset-0 z-[60] flex items-start justify-center pt-[20vh]">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/30 animate-fade-in"
         onClick={() => setIsOpen(false)}
       />
 

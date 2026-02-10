@@ -43,7 +43,7 @@ function ProgressRing({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         className="transition-all duration-700 ease-out"
-        style={{ filter: `drop-shadow(0 0 4px ${color})` }}
+        style={{ opacity: 0.9 }}
       />
     </svg>
   );

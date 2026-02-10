@@ -55,7 +55,7 @@ export const SavingsRateSpotlight = memo(function SavingsRateSpotlight({ savings
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             className="transition-all duration-1000 ease-out"
-            style={{ filter: `drop-shadow(0 0 6px ${color})` }}
+            style={{ opacity: 0.9 }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
