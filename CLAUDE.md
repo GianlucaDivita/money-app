@@ -688,6 +688,13 @@ Safari fullscreen + GPU filter properties (`backdrop-filter`, `filter: blur()`, 
 
 **Result: 13 GPU compositing layers → 0.** Glass aesthetic preserved through semi-transparent backgrounds + borders + box-shadows. Verified with Playwright WebKit stress test (10 scroll cycles + 10 page navigations, all cards stable).
 
+### Sample Data: Budgets & Goals (Feb 2026)
+- Extended `generateSampleTransactions()` in `src/lib/sampleData.ts` with two new exports: `generateSampleBudgets()` and `generateSampleGoals()`
+- **8 sample budgets**: Groceries ($500), Dining ($250), Transport ($200), Entertainment ($150), Shopping ($400), Utilities ($300), Subscriptions ($80), Housing ($2,000) — limits calibrated against generated transaction volumes to produce varied pacing states (under/on-track/ahead/over)
+- **4 sample goals**: Emergency Fund (42%), Vacation Fund (60%), New Laptop (75%), Investment Portfolio (10%) — varied progress, icons, colors, and deadlines
+- `DataManagement.tsx` seeds all three (transactions + budgets + goals) on "Load Sample Data" click
+- Disabled guard extended: button disabled when any of transactions, budgets, or goals already exist
+
 ### Known Non-Issues
 - Recharts `-1 width/height` warnings are cosmetic (ResponsiveContainer initialization race)
 

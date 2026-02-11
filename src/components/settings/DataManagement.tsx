@@ -12,10 +12,10 @@ import {
   generateExportFilename,
 } from '../../lib/exportUtils';
 import { parseCSV, mapCSVToTransactions } from '../../lib/importUtils';
-import { generateSampleTransactions } from '../../lib/sampleData';
+import { generateSampleTransactions, generateSampleBudgets, generateSampleGoals } from '../../lib/sampleData';
 
 export function DataManagement() {
-  const { transactions, categories, addTransaction } = useBudgetContext();
+  const { transactions, categories, budgets, goals, addTransaction, addBudget, addGoal } = useBudgetContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -154,18 +154,26 @@ export function DataManagement() {
                 for (const tx of sampleTxs) {
                   await addTransaction(tx);
                 }
-                toast('success', `Loaded ${sampleTxs.length} sample transactions`);
+                const sampleBudgets = generateSampleBudgets();
+                for (const b of sampleBudgets) {
+                  await addBudget(b);
+                }
+                const sampleGoals = generateSampleGoals();
+                for (const g of sampleGoals) {
+                  await addGoal(g);
+                }
+                toast('success', `Loaded ${sampleTxs.length} transactions, ${sampleBudgets.length} budgets, ${sampleGoals.length} goals`);
               } catch {
                 toast('error', 'Failed to load sample data');
               } finally {
                 setSeeding(false);
               }
             }}
-            disabled={seeding || transactions.length > 0}
+            disabled={seeding || transactions.length > 0 || budgets.length > 0 || goals.length > 0}
           >
             {seeding ? 'Loading...' : 'Load Sample Data'}
           </GlassButton>
-          {transactions.length > 0 && (
+          {(transactions.length > 0 || budgets.length > 0 || goals.length > 0) && (
             <p className="text-[10px] text-[var(--text-muted)] mt-1">
               Reset data first to load samples
             </p>

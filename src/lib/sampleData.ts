@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { format, subDays } from 'date-fns';
-import type { Transaction } from '../types';
+import { format, subDays, addMonths } from 'date-fns';
+import type { Transaction, Budget, SavingsGoal } from '../types';
 import { defaultCategories } from './categories';
 
 const expenseCategories = defaultCategories.filter(c => c.type === 'expense');
@@ -160,4 +160,63 @@ export function generateSampleTransactions(): Transaction[] {
   }
 
   return transactions;
+}
+
+export function generateSampleBudgets(): Budget[] {
+  const now = new Date().toISOString();
+  return [
+    { id: uuid(), categoryId: 'cat-groceries',     amount: 500,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-dining',         amount: 250,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-transport',      amount: 200,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-entertainment',  amount: 150,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-shopping',       amount: 400,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-utilities',      amount: 300,  period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-subscriptions',  amount: 80,   period: 'monthly', createdAt: now, isActive: true },
+    { id: uuid(), categoryId: 'cat-housing',        amount: 2000, period: 'monthly', createdAt: now, isActive: true },
+  ];
+}
+
+export function generateSampleGoals(): SavingsGoal[] {
+  const now = new Date();
+  return [
+    {
+      id: uuid(),
+      name: 'Emergency Fund',
+      targetAmount: 10000,
+      currentAmount: 4200,
+      icon: 'shield',
+      color: '#10b981',
+      createdAt: now.toISOString(),
+    },
+    {
+      id: uuid(),
+      name: 'Vacation Fund',
+      targetAmount: 3000,
+      currentAmount: 1800,
+      deadline: format(addMonths(now, 6), 'yyyy-MM-dd'),
+      icon: 'plane',
+      color: '#0ea5e9',
+      createdAt: now.toISOString(),
+    },
+    {
+      id: uuid(),
+      name: 'New Laptop',
+      targetAmount: 2000,
+      currentAmount: 1500,
+      deadline: format(addMonths(now, 3), 'yyyy-MM-dd'),
+      icon: 'laptop',
+      color: '#6366f1',
+      createdAt: now.toISOString(),
+    },
+    {
+      id: uuid(),
+      name: 'Investment Portfolio',
+      targetAmount: 5000,
+      currentAmount: 500,
+      deadline: format(addMonths(now, 12), 'yyyy-MM-dd'),
+      icon: 'trending-up',
+      color: '#f59e0b',
+      createdAt: now.toISOString(),
+    },
+  ];
 }
