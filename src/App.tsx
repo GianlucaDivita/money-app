@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -8,8 +8,10 @@ import { ToastProvider } from './components/shared/Toast';
 import { UndoProvider } from './context/UndoContext';
 import { AppShell } from './components/layout/AppShell';
 import { QuickAdd } from './components/shared/QuickAdd';
+import { WelcomeModal } from './components/shared/WelcomeModal';
 import { DashboardPage } from './components/dashboard/DashboardPage';
 import { ROUTES } from './lib/constants';
+import { getSetting, setSetting } from './lib/db';
 
 // Lazy-load heavier pages to reduce initial bundle
 const lazyImports = {
@@ -38,6 +40,19 @@ function PageFallback() {
 const ANIM_CLASSES = ['animate-fade-in-up', 'animate-fade-in', 'animate-scale-in', 'animate-slide-in-left'];
 
 export default function App() {
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+
+  useEffect(() => {
+    getSetting<boolean>('welcome-dismissed').then(dismissed => {
+      if (!dismissed) setWelcomeOpen(true);
+    });
+  }, []);
+
+  const handleWelcomeDismiss = useCallback(() => {
+    setSetting('welcome-dismissed', true);
+    setWelcomeOpen(false);
+  }, []);
+
   // Prefetch all lazy routes after initial paint so tab switching is instant
   useEffect(() => {
     const prefetch = () => Object.values(lazyImports).forEach(load => load());
@@ -88,6 +103,7 @@ export default function App() {
                     </Suspense>
                   </AppShell>
                   <QuickAdd />
+                  <WelcomeModal isOpen={welcomeOpen} onClose={handleWelcomeDismiss} />
                 </UndoProvider>
               </ToastProvider>
             </BudgetProvider>
