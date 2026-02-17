@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Info } from 'lucide-react';
+import { Info, Mail, Linkedin } from 'lucide-react';
 import { ThemeSelector } from './ThemeSelector';
 import { CurrencySelector } from './CurrencySelector';
 import { CategoryManager } from './CategoryManager';
@@ -34,6 +34,32 @@ export function SettingsPage() {
             <p className="text-xs text-[var(--text-muted)] mb-4">
               A privacy-first personal finance tracker. No accounts, no servers — your data never leaves this device.
             </p>
+
+            <div className="border-t border-[var(--divider)] pt-4 mb-4">
+              <p className="text-xs text-[var(--text-muted)] mb-1">Built by</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)] font-display mb-2">
+                Gianluca Di Vita
+              </p>
+              <div className="flex flex-col gap-1.5">
+                <a
+                  href="mailto:gianlucajdivita@gmail.com"
+                  className="inline-flex items-center gap-1.5 text-xs text-[var(--accent-primary)] hover:underline"
+                >
+                  <Mail size={13} />
+                  gianlucajdivita@gmail.com
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/gianlucadivita/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-[var(--accent-primary)] hover:underline"
+                >
+                  <Linkedin size={13} />
+                  LinkedIn
+                </a>
+              </div>
+            </div>
+
             <GlassButton
               variant="secondary"
               size="sm"
