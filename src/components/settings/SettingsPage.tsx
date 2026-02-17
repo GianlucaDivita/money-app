@@ -23,10 +23,6 @@ export function SettingsPage() {
           <ThemeSelector />
           <CurrencySelector />
           <DataManagement />
-        </div>
-        <div className="flex flex-col gap-5">
-          <CategoryManager />
-          <RecurringManager />
           <GlassCard>
             <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-3">
               About BudgetLens
@@ -69,6 +65,10 @@ export function SettingsPage() {
               About This App
             </GlassButton>
           </GlassCard>
+        </div>
+        <div className="flex flex-col gap-5">
+          <CategoryManager />
+          <RecurringManager />
         </div>
       </div>
 

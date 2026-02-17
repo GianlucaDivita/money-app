@@ -1,6 +1,10 @@
 import { useMemo, type ReactNode } from 'react';
 import { format } from 'date-fns';
-import { Settings } from 'lucide-react';
+import { Settings, Wallet } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../lib/constants';
+import { GlassCard } from '../shared/GlassCard';
+import { EmptyState } from '../shared/EmptyState';
 import { useBudgetContext } from '../../context/BudgetContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useDashboardLayout } from '../../hooks/useDashboardLayout';
@@ -48,8 +52,34 @@ export function DashboardPage() {
   const isVisible = (id: string) =>
     layout.widgets.find(w => w.id === id)?.visible !== false;
 
+  const navigate = useNavigate();
+
   if (isLoading) {
     return <DashboardSkeleton />;
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="animate-fade-in-up">
+          <h1 className="text-2xl font-display font-bold text-[var(--text-primary)]">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
+            {format(new Date(), 'EEEE, MMMM d')}
+          </p>
+        </div>
+        <GlassCard className="animate-fade-in-up">
+          <EmptyState
+            icon={<Wallet size={48} />}
+            title="Welcome to BudgetLens"
+            description="Add your first transaction to start tracking your finances. Your dashboard will come alive with charts, budgets, and insights."
+            actionLabel="Add Transaction"
+            onAction={() => navigate(ROUTES.TRANSACTIONS)}
+          />
+        </GlassCard>
+      </div>
+    );
   }
 
   // Widget registry
