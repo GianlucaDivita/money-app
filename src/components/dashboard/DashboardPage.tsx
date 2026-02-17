@@ -1,10 +1,12 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { format } from 'date-fns';
-import { Settings, Wallet } from 'lucide-react';
+import { Settings, Wallet, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../lib/constants';
 import { GlassCard } from '../shared/GlassCard';
+import { GlassButton } from '../shared/GlassButton';
 import { EmptyState } from '../shared/EmptyState';
+import { generateSampleTransactions, generateSampleBudgets, generateSampleGoals } from '../../lib/sampleData';
 import { useBudgetContext } from '../../context/BudgetContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useDashboardLayout } from '../../hooks/useDashboardLayout';
@@ -25,7 +27,8 @@ import { RecurringBanner } from './RecurringBanner';
 import { DashboardSkeleton } from '../shared/GlassSkeleton';
 
 export function DashboardPage() {
-  const { transactions, categories, budgets, goals, isLoading } = useBudgetContext();
+  const { transactions, categories, budgets, goals, isLoading, addTransaction, addBudget, addGoal } = useBudgetContext();
+  const [seeding, setSeeding] = useState(false);
   const {
     currentIncome,
     currentExpenses,
@@ -77,6 +80,26 @@ export function DashboardPage() {
             actionLabel="Add Transaction"
             onAction={() => navigate(ROUTES.TRANSACTIONS)}
           />
+          <div className="flex justify-center -mt-2 pb-4">
+            <GlassButton
+              variant="secondary"
+              size="sm"
+              icon={<Sparkles size={14} />}
+              disabled={seeding}
+              onClick={async () => {
+                setSeeding(true);
+                try {
+                  for (const tx of generateSampleTransactions()) await addTransaction(tx);
+                  for (const b of generateSampleBudgets()) await addBudget(b);
+                  for (const g of generateSampleGoals()) await addGoal(g);
+                } finally {
+                  setSeeding(false);
+                }
+              }}
+            >
+              {seeding ? 'Loading...' : 'Load Demo Data'}
+            </GlassButton>
+          </div>
         </GlassCard>
       </div>
     );
