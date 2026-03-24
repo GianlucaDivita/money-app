@@ -83,11 +83,16 @@ export function DataManagement() {
   }
 
   async function handleReset() {
-    // Clear IndexedDB and reload
+    // Clear IndexedDB fully before reloading
     const dbs = await indexedDB.databases();
-    for (const db of dbs) {
-      if (db.name) indexedDB.deleteDatabase(db.name);
-    }
+    await Promise.all(
+      dbs.map(db => db.name ? new Promise<void>((resolve, reject) => {
+        const req = indexedDB.deleteDatabase(db.name!);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+        req.onblocked = () => resolve(); // proceed even if blocked
+      }) : Promise.resolve())
+    );
     window.location.reload();
   }
 

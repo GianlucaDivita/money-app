@@ -10,7 +10,7 @@ export function TopBar({ onAddTransaction }: TopBarProps) {
   const { resolvedTheme, toggleTheme } = useTheme();
 
   return (
-    <header className="topbar-glass sticky top-0 z-30 flex items-center justify-between py-4 px-5 md:px-8 mb-6 -mx-5 md:mx-0 md:rounded-2xl md:mt-5 md:mb-8">
+    <header className="topbar-glass sticky top-0 z-30 flex items-center justify-between py-4 px-5 md:px-8 mb-6 -mx-5 md:mx-0 md:rounded-2xl md:mt-5 md:mb-8 safe-top">
       {/* Mobile logo */}
       <div className="flex items-center gap-2.5 md:hidden">
         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[#8b5cf6] flex items-center justify-center">
