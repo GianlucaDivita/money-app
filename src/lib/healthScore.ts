@@ -45,7 +45,7 @@ export function calculateHealthScore(
 
   // 2. Budget Adherence (25%)
   const activeBudgets = budgets.filter(b => b.isActive);
-  let budgetScore = 100;
+  let budgetScore = 50; // Neutral when no budgets set
   if (activeBudgets.length > 0) {
     const scores = activeBudgets.map(b => {
       const status = calculateBudgetStatus(b, currentTxs, now);

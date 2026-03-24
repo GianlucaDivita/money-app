@@ -120,6 +120,7 @@ interface BudgetContextValue extends BudgetState {
   updateRecurringRule: (rule: RecurringRule) => Promise<void>;
   deleteRecurringRule: (id: string) => Promise<void>;
   refreshData: () => Promise<void>;
+  seedDemoData: (txs: Transaction[], budgets: Budget[], goals: SavingsGoal[]) => Promise<void>;
 }
 
 const BudgetContext = createContext<BudgetContextValue | null>(null);
@@ -218,6 +219,16 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'DELETE_RECURRING_RULE', payload: id });
   }, []);
 
+  // Batch-write demo data to IndexedDB without per-item dispatches,
+  // then reload state in a single shot for a smooth transition.
+  const seedDemoData = useCallback(async (txs: Transaction[], newBudgets: Budget[], newGoals: SavingsGoal[]) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    for (const tx of txs) await db.addTransaction(tx);
+    for (const b of newBudgets) await db.addBudget(b);
+    for (const g of newGoals) await db.addGoal(g);
+    await loadData();
+  }, [loadData]);
+
   const contextValue = useMemo<BudgetContextValue>(() => ({
     ...state,
     addTransaction,
@@ -233,13 +244,14 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     updateRecurringRule,
     deleteRecurringRule,
     refreshData: loadData,
+    seedDemoData,
   }), [
     state,
     addTransaction, updateTransaction, deleteTransaction,
     addBudget, updateBudget, deleteBudget,
     addGoal, updateGoal, deleteGoal,
     addRecurringRule, updateRecurringRule, deleteRecurringRule,
-    loadData,
+    loadData, seedDemoData,
   ]);
 
   return (

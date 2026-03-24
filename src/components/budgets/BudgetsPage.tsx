@@ -20,6 +20,7 @@ export function BudgetsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'status' | 'spent' | 'name'>('status');
 
   const categoryMap = useMemo(
     () => new Map(categories.map((c) => [c.id, c])),
@@ -36,10 +37,19 @@ export function BudgetsPage() {
 
   const budgetStatuses = useMemo(() => {
     const now = new Date();
-    return budgets
+    const statuses = budgets
       .filter((b) => b.isActive)
       .map((b) => calculateBudgetStatus(b, currentMonthTxs, now));
-  }, [budgets, currentMonthTxs]);
+
+    const pacingOrder = { over: 0, ahead: 1, 'on-track': 2, under: 3 };
+    return [...statuses].sort((a, b) => {
+      if (sortBy === 'status') return pacingOrder[a.pacing] - pacingOrder[b.pacing];
+      if (sortBy === 'spent') return b.spent - a.spent;
+      const nameA = categoryMap.get(a.budget.categoryId)?.name || '';
+      const nameB = categoryMap.get(b.budget.categoryId)?.name || '';
+      return nameA.localeCompare(nameB);
+    });
+  }, [budgets, currentMonthTxs, sortBy, categoryMap]);
 
   async function handleDelete() {
     if (!deletingId) return;
@@ -65,6 +75,24 @@ export function BudgetsPage() {
           Set Budget
         </GlassButton>
       </div>
+
+      {budgetStatuses.length > 1 && (
+        <div className="flex gap-2 animate-fade-in">
+          {(['status', 'spent', 'name'] as const).map((opt) => (
+            <button
+              key={opt}
+              onClick={() => setSortBy(opt)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                sortBy === opt
+                  ? 'bg-[var(--accent-primary)] text-white shadow-sm'
+                  : 'glass-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {opt === 'status' ? 'By Status' : opt === 'spent' ? 'By Spent' : 'By Name'}
+            </button>
+          ))}
+        </div>
+      )}
 
       {budgetStatuses.length === 0 ? (
         <EmptyState

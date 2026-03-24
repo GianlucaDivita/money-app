@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Target } from 'lucide-react';
 import type { SavingsGoal } from '../../types';
 import { useBudgetContext } from '../../context/BudgetContext';
@@ -18,6 +18,24 @@ export function GoalsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'progress' | 'deadline' | 'name'>('progress');
+
+  const sortedGoals = useMemo(() => {
+    return [...goals].sort((a, b) => {
+      if (sortBy === 'progress') {
+        const pA = a.targetAmount > 0 ? a.currentAmount / a.targetAmount : 0;
+        const pB = b.targetAmount > 0 ? b.currentAmount / b.targetAmount : 0;
+        return pB - pA;
+      }
+      if (sortBy === 'deadline') {
+        if (!a.deadline && !b.deadline) return 0;
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return a.deadline.localeCompare(b.deadline);
+      }
+      return a.name.localeCompare(b.name);
+    });
+  }, [goals, sortBy]);
 
   async function handleDelete() {
     if (!deletingId) return;
@@ -44,6 +62,24 @@ export function GoalsPage() {
         </GlassButton>
       </div>
 
+      {goals.length > 1 && (
+        <div className="flex gap-2 animate-fade-in">
+          {(['progress', 'deadline', 'name'] as const).map((opt) => (
+            <button
+              key={opt}
+              onClick={() => setSortBy(opt)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                sortBy === opt
+                  ? 'bg-[var(--accent-primary)] text-white shadow-sm'
+                  : 'glass-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {opt === 'progress' ? 'By Progress' : opt === 'deadline' ? 'By Deadline' : 'By Name'}
+            </button>
+          ))}
+        </div>
+      )}
+
       {goals.length === 0 ? (
         <EmptyState
           icon={<Target size={48} />}
@@ -54,7 +90,7 @@ export function GoalsPage() {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {goals.map((goal, i) => (
+          {sortedGoals.map((goal, i) => (
             <div key={goal.id} className={`animate-fade-in-up stagger-${i + 1}`}>
               <GoalCard
                 goal={goal}

@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# BudgetLens
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Privacy-first personal budget tracker with a glassmorphism interface.**
+No accounts. No servers. Your data stays on your device.
 
-Currently, two official plugins are available:
+**[Live Demo](https://budgetlens-app.vercel.app)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Manual transaction tracking** — Income and expenses with categories, merchants, tags, and receipt photos
+- **Interactive dashboard** — Balance card, spending pie chart, income vs. expense bars, trend lines, and budget progress rings
+- **Smart budgets** — Set spending limits per category with real-time pacing indicators (under/on-track/ahead/over)
+- **Savings goals** — Track progress toward financial targets with deadlines and visual progress bars
+- **Analytics deep-dive** — Spending heatmap, category trends, monthly comparisons, cash flow waterfall, year-in-review
+- **Financial health score** — Weighted composite of savings rate, budget adherence, spending trends, and goal progress
+- **Split transactions** — Divide a single transaction across multiple categories
+- **Recurring templates** — Auto-detect and confirm recurring transactions (rent, subscriptions, salary)
+- **Smart insights** — Pattern detection engine surfaces spending anomalies, streaks, and budget warnings
+- **Quick-add** — `Cmd/Ctrl + K` to add transactions in natural shorthand: `$45 groceries Trader Joe's`
+- **Global search** — Press `/` to search across all transactions instantly
+- **Installable PWA** — Works offline, installs like a native app on mobile and desktop
+- **Full data portability** — Export/import as CSV or JSON. No lock-in.
+- **Dashboard customizer** — Toggle and reorder dashboard widgets to your preference
+- **Dark + Light themes** — Glassmorphism UI tuned for both, with smooth transitions
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19** + **TypeScript** (strict mode)
+- **Tailwind CSS v4** with custom glassmorphism design system
+- **Recharts** for interactive data visualizations
+- **IndexedDB** (via `idb`) for client-side persistence
+- **Vite** with Turbopack-speed HMR
+- **vite-plugin-pwa** for offline-capable Progressive Web App
+- **~232 KB gzipped** initial bundle (lazy-loaded routes, manual Rollup chunks)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Quick Start
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/your-username/money-app.git
+cd money-app
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) and click "Load Demo Data" to explore.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Architecture
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Client-side SPA with React Context (`useReducer`) for global state and IndexedDB for persistence. All financial calculations happen in `lib/calculations.ts` with string-based date comparisons for performance. Dashboard widgets are wrapped in `React.memo` and routes are lazy-loaded with idle-time prefetching for instant tab switching.
+
+## Author
+
+**Gianluca Di Vita**
+- Email: gianlucajdivita@gmail.com
+- LinkedIn: [linkedin.com/in/gianlucadivita](https://www.linkedin.com/in/gianlucadivita/)

@@ -13,8 +13,8 @@ export function exportTransactionsCSV(
     tx.type,
     catMap.get(tx.categoryId) || 'Unknown',
     tx.amount.toFixed(2),
-    `"${(tx.description || '').replace(/"/g, '""')}"`,
-    `"${(tx.merchant || '').replace(/"/g, '""')}"`,
+    `"${(tx.description || '').replace(/[\r\n]+/g, ' ').replace(/"/g, '""')}"`,
+    `"${(tx.merchant || '').replace(/[\r\n]+/g, ' ').replace(/"/g, '""')}"`,
     `"${(tx.tags || []).join(', ')}"`,
     `"${tx.splits ? tx.splits.map(s => `${catMap.get(s.categoryId) || s.categoryId}:${s.amount.toFixed(2)}`).join('; ') : ''}"`,
   ]);

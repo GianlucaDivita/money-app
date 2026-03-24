@@ -24,6 +24,7 @@ export function BudgetForm({ isOpen, onClose, editBudget }: BudgetFormProps) {
   const [categoryId, setCategoryId] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<'monthly' | 'weekly'>('monthly');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!editBudget;
 
@@ -69,17 +70,23 @@ export function BudgetForm({ isOpen, onClose, editBudget }: BudgetFormProps) {
       isActive: true,
     };
 
-    if (isEditing) {
-      pushAction({ type: 'update', entity: 'budget', description: `edited budget`, before: editBudget, after: budget });
-      await updateBudget(budget);
-      toast('success', 'Budget updated');
-    } else {
-      await addBudget(budget);
-      pushAction({ type: 'add', entity: 'budget', description: `created budget`, after: budget });
-      toast('success', 'Budget created');
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        pushAction({ type: 'update', entity: 'budget', description: `edited budget`, before: editBudget, after: budget });
+        await updateBudget(budget);
+        toast('success', 'Budget updated');
+      } else {
+        await addBudget(budget);
+        pushAction({ type: 'add', entity: 'budget', description: `created budget`, after: budget });
+        toast('success', 'Budget created');
+      }
+      onClose();
+    } catch {
+      toast('error', 'Failed to save budget. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onClose();
   }
 
   return (
@@ -130,8 +137,8 @@ export function BudgetForm({ isOpen, onClose, editBudget }: BudgetFormProps) {
           <GlassButton variant="secondary" type="button" onClick={onClose} className="flex-1">
             Cancel
           </GlassButton>
-          <GlassButton variant="primary" type="submit" className="flex-1">
-            {isEditing ? 'Save' : 'Create Budget'}
+          <GlassButton variant="primary" type="submit" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : isEditing ? 'Save' : 'Create Budget'}
           </GlassButton>
         </div>
       </form>

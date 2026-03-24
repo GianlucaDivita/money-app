@@ -27,7 +27,7 @@ import { RecurringBanner } from './RecurringBanner';
 import { DashboardSkeleton } from '../shared/GlassSkeleton';
 
 export function DashboardPage() {
-  const { transactions, categories, budgets, goals, isLoading, addTransaction, addBudget, addGoal } = useBudgetContext();
+  const { transactions, categories, budgets, goals, isLoading, seedDemoData } = useBudgetContext();
   const [seeding, setSeeding] = useState(false);
   const {
     currentIncome,
@@ -89,9 +89,11 @@ export function DashboardPage() {
               onClick={async () => {
                 setSeeding(true);
                 try {
-                  for (const tx of generateSampleTransactions()) await addTransaction(tx);
-                  for (const b of generateSampleBudgets()) await addBudget(b);
-                  for (const g of generateSampleGoals()) await addGoal(g);
+                  await seedDemoData(
+                    generateSampleTransactions(),
+                    generateSampleBudgets(),
+                    generateSampleGoals()
+                  );
                 } finally {
                   setSeeding(false);
                 }
@@ -145,6 +147,7 @@ export function DashboardPage() {
           onClick={() => layout.setIsCustomizing(true)}
           className="p-2 rounded-xl hover:bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
           aria-label="Customize dashboard"
+          title="Customize dashboard"
         >
           <Settings size={18} />
         </button>

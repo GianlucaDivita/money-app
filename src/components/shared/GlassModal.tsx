@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 
 interface GlassModalProps {
@@ -15,7 +15,12 @@ const sizeStyles = {
   lg: 'max-w-2xl',
 };
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function GlassModal({ isOpen, onClose, title, children, size = 'md' }: GlassModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<Element | null>(null);
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -28,11 +33,52 @@ export function GlassModal({ isOpen, onClose, title, children, size = 'md' }: Gl
     };
   }, [isOpen]);
 
-  // Close on Escape key
+  // Focus management: trap focus inside modal, restore on close
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    previousFocusRef.current = document.activeElement;
+
+    // Focus the first focusable element inside the modal
+    const focusables = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+    if (focusables.length > 0) {
+      focusables[0].focus();
+    }
+
+    return () => {
+      // Restore focus when modal closes
+      if (previousFocusRef.current instanceof HTMLElement) {
+        previousFocusRef.current.focus();
+      }
+    };
+  }, [isOpen]);
+
+  // Close on Escape + focus trap on Tab
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -50,6 +96,7 @@ export function GlassModal({ isOpen, onClose, title, children, size = 'md' }: Gl
       />
       {/* Modal */}
       <div
+        ref={modalRef}
         className={`
           relative glass p-6 w-full ${sizeStyles[size]}
           animate-scale-in

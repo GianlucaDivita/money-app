@@ -3,6 +3,18 @@ import type { Transaction, Category, Budget, SavingsGoal, RecurringRule } from '
 import { DB_NAME, DB_VERSION } from './constants';
 import { defaultCategories } from './categories';
 
+export class DBError extends Error {
+  operation: string;
+  cause: unknown;
+  constructor(operation: string, cause: unknown) {
+    const message = cause instanceof Error ? cause.message : 'Unknown database error';
+    super(`Database error in ${operation}: ${message}`);
+    this.name = 'DBError';
+    this.operation = operation;
+    this.cause = cause;
+  }
+}
+
 interface BudgetLensDB {
   transactions: {
     key: string;
@@ -93,127 +105,186 @@ export async function seedDefaults(): Promise<void> {
 // ===== Transaction CRUD =====
 
 export async function getAllTransactions(): Promise<Transaction[]> {
-  const db = await getDB();
-  return db.getAll('transactions');
+  try {
+    const db = await getDB();
+    return await db.getAll('transactions');
+  } catch (err) { throw new DBError('getAllTransactions', err); }
 }
 
 export async function getTransaction(id: string): Promise<Transaction | undefined> {
-  const db = await getDB();
-  return db.get('transactions', id);
+  try {
+    const db = await getDB();
+    return await db.get('transactions', id);
+  } catch (err) { throw new DBError('getTransaction', err); }
 }
 
 export async function addTransaction(transaction: Transaction): Promise<void> {
-  const db = await getDB();
-  await db.put('transactions', transaction);
+  try {
+    const db = await getDB();
+    await db.put('transactions', transaction);
+  } catch (err) { throw new DBError('addTransaction', err); }
 }
 
 export async function updateTransaction(transaction: Transaction): Promise<void> {
-  const db = await getDB();
-  await db.put('transactions', transaction);
+  try {
+    const db = await getDB();
+    await db.put('transactions', transaction);
+  } catch (err) { throw new DBError('updateTransaction', err); }
 }
 
 export async function deleteTransaction(id: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('transactions', id);
+  try {
+    const db = await getDB();
+    await db.delete('transactions', id);
+  } catch (err) { throw new DBError('deleteTransaction', err); }
 }
 
 // ===== Category CRUD =====
 
 export async function getAllCategories(): Promise<Category[]> {
-  const db = await getDB();
-  return db.getAll('categories');
+  try {
+    const db = await getDB();
+    return await db.getAll('categories');
+  } catch (err) { throw new DBError('getAllCategories', err); }
 }
 
 export async function addCategory(category: Category): Promise<void> {
-  const db = await getDB();
-  await db.put('categories', category);
+  try {
+    const db = await getDB();
+    await db.put('categories', category);
+  } catch (err) { throw new DBError('addCategory', err); }
 }
 
 export async function updateCategory(category: Category): Promise<void> {
-  const db = await getDB();
-  await db.put('categories', category);
+  try {
+    const db = await getDB();
+    await db.put('categories', category);
+  } catch (err) { throw new DBError('updateCategory', err); }
 }
 
 export async function deleteCategory(id: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('categories', id);
+  try {
+    const db = await getDB();
+    await db.delete('categories', id);
+  } catch (err) { throw new DBError('deleteCategory', err); }
 }
 
 // ===== Budget CRUD =====
 
 export async function getAllBudgets(): Promise<Budget[]> {
-  const db = await getDB();
-  return db.getAll('budgets');
+  try {
+    const db = await getDB();
+    return await db.getAll('budgets');
+  } catch (err) { throw new DBError('getAllBudgets', err); }
 }
 
 export async function addBudget(budget: Budget): Promise<void> {
-  const db = await getDB();
-  await db.put('budgets', budget);
+  try {
+    const db = await getDB();
+    await db.put('budgets', budget);
+  } catch (err) { throw new DBError('addBudget', err); }
 }
 
 export async function updateBudget(budget: Budget): Promise<void> {
-  const db = await getDB();
-  await db.put('budgets', budget);
+  try {
+    const db = await getDB();
+    await db.put('budgets', budget);
+  } catch (err) { throw new DBError('updateBudget', err); }
 }
 
 export async function deleteBudget(id: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('budgets', id);
+  try {
+    const db = await getDB();
+    await db.delete('budgets', id);
+  } catch (err) { throw new DBError('deleteBudget', err); }
 }
 
 // ===== Savings Goals CRUD =====
 
 export async function getAllGoals(): Promise<SavingsGoal[]> {
-  const db = await getDB();
-  return db.getAll('savingsGoals');
+  try {
+    const db = await getDB();
+    return await db.getAll('savingsGoals');
+  } catch (err) { throw new DBError('getAllGoals', err); }
 }
 
 export async function addGoal(goal: SavingsGoal): Promise<void> {
-  const db = await getDB();
-  await db.put('savingsGoals', goal);
+  try {
+    const db = await getDB();
+    await db.put('savingsGoals', goal);
+  } catch (err) { throw new DBError('addGoal', err); }
 }
 
 export async function updateGoal(goal: SavingsGoal): Promise<void> {
-  const db = await getDB();
-  await db.put('savingsGoals', goal);
+  try {
+    const db = await getDB();
+    await db.put('savingsGoals', goal);
+  } catch (err) { throw new DBError('updateGoal', err); }
 }
 
 export async function deleteGoal(id: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('savingsGoals', id);
+  try {
+    const db = await getDB();
+    await db.delete('savingsGoals', id);
+  } catch (err) { throw new DBError('deleteGoal', err); }
 }
 
 // ===== Recurring Rules CRUD =====
 
 export async function getAllRecurringRules(): Promise<RecurringRule[]> {
-  const db = await getDB();
-  return db.getAll('recurringRules');
+  try {
+    const db = await getDB();
+    return await db.getAll('recurringRules');
+  } catch (err) { throw new DBError('getAllRecurringRules', err); }
 }
 
 export async function addRecurringRule(rule: RecurringRule): Promise<void> {
-  const db = await getDB();
-  await db.put('recurringRules', rule);
+  try {
+    const db = await getDB();
+    await db.put('recurringRules', rule);
+  } catch (err) { throw new DBError('addRecurringRule', err); }
 }
 
 export async function updateRecurringRule(rule: RecurringRule): Promise<void> {
-  const db = await getDB();
-  await db.put('recurringRules', rule);
+  try {
+    const db = await getDB();
+    await db.put('recurringRules', rule);
+  } catch (err) { throw new DBError('updateRecurringRule', err); }
 }
 
 export async function deleteRecurringRule(id: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('recurringRules', id);
+  try {
+    const db = await getDB();
+    await db.delete('recurringRules', id);
+  } catch (err) { throw new DBError('deleteRecurringRule', err); }
 }
 
 // ===== Settings =====
 
 export async function getSetting<T>(key: string): Promise<T | undefined> {
-  const db = await getDB();
-  const result = await db.get('settings', key);
-  return result?.value as T | undefined;
+  try {
+    const db = await getDB();
+    const result = await db.get('settings', key);
+    return result?.value as T | undefined;
+  } catch (err) { throw new DBError('getSetting', err); }
 }
 
 export async function setSetting(key: string, value: unknown): Promise<void> {
-  const db = await getDB();
-  await db.put('settings', { key, value });
+  try {
+    const db = await getDB();
+    await db.put('settings', { key, value });
+  } catch (err) { throw new DBError('setSetting', err); }
+}
+
+// ===== Health Check =====
+
+export async function checkDBAvailability(): Promise<boolean> {
+  try {
+    const db = await getDB();
+    await db.put('settings', { key: '_healthcheck', value: true });
+    const result = await db.get('settings', '_healthcheck');
+    return result?.value === true;
+  } catch {
+    return false;
+  }
 }

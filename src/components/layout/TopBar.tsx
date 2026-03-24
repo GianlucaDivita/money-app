@@ -1,4 +1,4 @@
-import { Sun, Moon, Plus, Command } from 'lucide-react';
+import { Sun, Moon, Plus, Command, Search } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { GlassButton } from '../shared/GlassButton';
 
@@ -19,10 +19,19 @@ export function TopBar({ onAddTransaction }: TopBarProps) {
         <span className="font-display font-bold text-[var(--text-primary)]">BudgetLens</span>
       </div>
 
-      {/* Kbd hint for desktop */}
-      <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--divider)] text-xs text-[var(--text-muted)]">
-        <Command size={12} />
-        <span>K to quick-add</span>
+      {/* Kbd hints for desktop */}
+      <div className="hidden md:flex items-center gap-3">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--divider)] text-xs text-[var(--text-muted)]">
+          <Command size={12} />
+          <span>K to quick-add</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--divider)] text-xs text-[var(--text-muted)]">
+          <Search size={12} />
+          <span>/ to search</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--divider)] text-xs text-[var(--text-muted)]">
+          <span>? for shortcuts</span>
+        </div>
       </div>
 
       {/* Actions */}

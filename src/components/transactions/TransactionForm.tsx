@@ -35,8 +35,10 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
   const [isSplit, setIsSplit] = useState(false);
   const [splits, setSplits] = useState<TransactionSplit[]>([]);
   const [receiptImage, setReceiptImage] = useState<string | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!editTransaction;
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
 
   // Populate form when editing
   useEffect(() => {
@@ -125,18 +127,24 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
       receiptImage,
     };
 
-    if (isEditing) {
-      pushAction({ type: 'update', entity: 'transaction', description: `edited ${tx.description}`, before: editTransaction, after: tx });
-      await updateTransaction(tx);
-      toast('success', 'Transaction updated');
-    } else {
-      await addTransaction(tx);
-      pushAction({ type: 'add', entity: 'transaction', description: `added ${tx.description}`, after: tx });
-      toast('success', 'Transaction added');
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        pushAction({ type: 'update', entity: 'transaction', description: `edited ${tx.description}`, before: editTransaction, after: tx });
+        await updateTransaction(tx);
+        toast('success', 'Transaction updated');
+      } else {
+        await addTransaction(tx);
+        pushAction({ type: 'add', entity: 'transaction', description: `added ${tx.description}`, after: tx });
+        toast('success', 'Transaction added');
+      }
+      resetForm();
+      onClose();
+    } catch {
+      toast('error', 'Failed to save transaction. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    resetForm();
-    onClose();
   }
 
   return (
@@ -245,6 +253,7 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           icon={<FileText size={16} />}
+          maxLength={100}
           required
         />
 
@@ -255,6 +264,7 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
           value={merchant}
           onChange={(e) => setMerchant(e.target.value)}
           icon={<Store size={16} />}
+          maxLength={50}
         />
 
         {/* Date */}
@@ -264,6 +274,7 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
           value={date}
           onChange={(e) => setDate(e.target.value)}
           icon={<Calendar size={16} />}
+          max={todayStr}
           required
         />
 
@@ -284,8 +295,8 @@ export function TransactionForm({ isOpen, onClose, editTransaction }: Transactio
           <GlassButton variant="secondary" type="button" onClick={onClose} className="flex-1">
             Cancel
           </GlassButton>
-          <GlassButton variant="primary" type="submit" className="flex-1">
-            {isEditing ? 'Save Changes' : 'Add Transaction'}
+          <GlassButton variant="primary" type="submit" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Transaction'}
           </GlassButton>
         </div>
       </form>

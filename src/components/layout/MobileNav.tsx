@@ -25,7 +25,7 @@ export function MobileNav() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl min-w-[52px] text-[10px] font-medium transition-all ${
+              `flex flex-col items-center gap-0.5 px-3 py-2.5 rounded-xl min-w-[52px] min-h-[44px] text-[10px] font-medium transition-all ${
                 isActive
                   ? 'text-[var(--accent-primary)]'
                   : 'text-[var(--text-muted)]'
@@ -34,7 +34,7 @@ export function MobileNav() {
           >
             {({ isActive }) => (
               <>
-                <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-[var(--accent-primary)]/10' : ''}`}>
+                <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-[var(--accent-primary)]/10' : ''}`}>
                   <Icon size={20} strokeWidth={isActive ? 2.2 : 1.6} />
                 </div>
                 <span>{label}</span>

@@ -9,6 +9,7 @@
   --bg-gradient-end: #fce4ec;
   --glass-bg: rgba(255, 255, 255, 0.82);
   --glass-bg-heavy: rgba(255, 255, 255, 0.9);
+  --welcome-modal-bg: rgba(245, 245, 255, 0.97);
   --glass-border: rgba(255, 255, 255, 0.85);
   --glass-border-subtle: rgba(200, 200, 230, 0.3);
   --glass-shadow: 0 4px 24px rgba(31, 38, 135, 0.08), 0 1px 3px rgba(31, 38, 135, 0.06);
@@ -32,6 +33,7 @@
   --bg-gradient-end: #1c0d1e;
   --glass-bg: rgba(20, 20, 40, 0.78);
   --glass-bg-heavy: rgba(20, 20, 40, 0.88);
+  --welcome-modal-bg: rgba(18, 18, 32, 0.97);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-subtle: rgba(255, 255, 255, 0.05);
   --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);

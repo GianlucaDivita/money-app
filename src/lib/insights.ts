@@ -104,9 +104,12 @@ export function generateInsights(
 
   budgets.forEach((budget) => {
     if (!budget.isActive) return;
-    const spent = currentExpenses
-      .filter((tx) => tx.categoryId === budget.categoryId)
-      .reduce((s, t) => s + t.amount, 0);
+    let spent = 0;
+    for (const tx of currentExpenses) {
+      for (const part of getEffectiveCategories(tx)) {
+        if (part.categoryId === budget.categoryId) spent += part.amount;
+      }
+    }
     const pctUsed = spent / budget.amount;
 
     if (pctUsed > pctOfMonth + 0.2 && pctUsed < 1) {

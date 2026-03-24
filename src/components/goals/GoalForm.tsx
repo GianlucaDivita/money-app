@@ -30,6 +30,7 @@ export function GoalForm({ isOpen, onClose, editGoal }: GoalFormProps) {
   const [deadline, setDeadline] = useState('');
   const [icon, setIcon] = useState('piggy-bank');
   const [color, setColor] = useState('#10b981');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!editGoal;
 
@@ -77,17 +78,23 @@ export function GoalForm({ isOpen, onClose, editGoal }: GoalFormProps) {
       createdAt: editGoal?.createdAt || new Date().toISOString(),
     };
 
-    if (isEditing) {
-      pushAction({ type: 'update', entity: 'goal', description: `edited ${goal.name}`, before: editGoal, after: goal });
-      await updateGoal(goal);
-      toast('success', 'Goal updated');
-    } else {
-      await addGoal(goal);
-      pushAction({ type: 'add', entity: 'goal', description: `created ${goal.name}`, after: goal });
-      toast('success', 'Goal created');
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        pushAction({ type: 'update', entity: 'goal', description: `edited ${goal.name}`, before: editGoal, after: goal });
+        await updateGoal(goal);
+        toast('success', 'Goal updated');
+      } else {
+        await addGoal(goal);
+        pushAction({ type: 'add', entity: 'goal', description: `created ${goal.name}`, after: goal });
+        toast('success', 'Goal created');
+      }
+      onClose();
+    } catch {
+      toast('error', 'Failed to save goal. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onClose();
   }
 
   return (
@@ -103,6 +110,7 @@ export function GoalForm({ isOpen, onClose, editGoal }: GoalFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           icon={<Type size={16} />}
+          maxLength={50}
           required
         />
 
@@ -180,8 +188,8 @@ export function GoalForm({ isOpen, onClose, editGoal }: GoalFormProps) {
           <GlassButton variant="secondary" type="button" onClick={onClose} className="flex-1">
             Cancel
           </GlassButton>
-          <GlassButton variant="primary" type="submit" className="flex-1">
-            {isEditing ? 'Save' : 'Create Goal'}
+          <GlassButton variant="primary" type="submit" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : isEditing ? 'Save' : 'Create Goal'}
           </GlassButton>
         </div>
       </form>

@@ -15,7 +15,7 @@ import { parseCSV, mapCSVToTransactions } from '../../lib/importUtils';
 import { generateSampleTransactions, generateSampleBudgets, generateSampleGoals } from '../../lib/sampleData';
 
 export function DataManagement() {
-  const { transactions, categories, budgets, goals, addTransaction, addBudget, addGoal } = useBudgetContext();
+  const { transactions, categories, budgets, goals, addTransaction, seedDemoData } = useBudgetContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -151,17 +151,9 @@ export function DataManagement() {
               setSeeding(true);
               try {
                 const sampleTxs = generateSampleTransactions();
-                for (const tx of sampleTxs) {
-                  await addTransaction(tx);
-                }
                 const sampleBudgets = generateSampleBudgets();
-                for (const b of sampleBudgets) {
-                  await addBudget(b);
-                }
                 const sampleGoals = generateSampleGoals();
-                for (const g of sampleGoals) {
-                  await addGoal(g);
-                }
+                await seedDemoData(sampleTxs, sampleBudgets, sampleGoals);
                 toast('success', `Loaded ${sampleTxs.length} transactions, ${sampleBudgets.length} budgets, ${sampleGoals.length} goals`);
               } catch {
                 toast('error', 'Failed to load sample data');

@@ -1,4 +1,4 @@
-import { forwardRef, type SelectHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, useId, type SelectHTMLAttributes, type ReactNode } from 'react';
 
 interface GlassSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -8,22 +8,29 @@ interface GlassSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const GlassSelect = forwardRef<HTMLSelectElement, GlassSelectProps>(
-  ({ label, error, icon, children, className = '', ...props }, ref) => {
+  ({ label, error, icon, children, className = '', id: propId, ...props }, ref) => {
+    const autoId = useId();
+    const selectId = propId || autoId;
+    const errorId = `${selectId}-error`;
+
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label className="text-sm font-medium text-[var(--text-secondary)]">
+          <label htmlFor={selectId} className="text-sm font-medium text-[var(--text-secondary)]">
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true">
               {icon}
             </span>
           )}
           <select
             ref={ref}
+            id={selectId}
+            aria-describedby={error ? errorId : undefined}
+            aria-invalid={error ? true : undefined}
             className={`
               w-full glass-sm px-4 py-2.5 text-sm appearance-none
               text-[var(--text-primary)] bg-transparent
@@ -37,14 +44,14 @@ export const GlassSelect = forwardRef<HTMLSelectElement, GlassSelectProps>(
           >
             {children}
           </select>
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
         </div>
         {error && (
-          <span className="text-xs text-[var(--accent-expense)]">{error}</span>
+          <span id={errorId} className="text-xs text-[var(--accent-expense)]" role="alert">{error}</span>
         )}
       </div>
     );
